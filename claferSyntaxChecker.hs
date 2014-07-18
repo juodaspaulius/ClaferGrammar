@@ -39,7 +39,10 @@ run input =
     result `cth` handleErrs
   where
   cth (Left err) f = f err
-  cth (Right r)  _ = showTree 2 r
+  cth (Right r)  _ = handleSuccess r
+  handleSuccess tree = do
+    putStrLn "\nSuccessfully parsed!\n"
+    showTree 2 tree
   handleErrs :: [ClaferErr] -> IO ()
   handleErrs = mapM_ handleErr
   handleErr (ClaferErr mesg) =

@@ -1,8 +1,11 @@
 all:
 	happy -gca Parclafer.y
 	alex -g Lexclafer.x
-	rm Testclafer.hs
 	ghc --make claferSyntaxChecker.hs
+
+grammar:
+	bnfc clafer.cf
+	rm Testclafer.hs
 
 clean:
 	-rm -f *.log *.aux *.hi *.o *.dvi
