@@ -11,20 +11,20 @@ Clafer Syntax Checker
 =============
 
 ### Building Clafer syntax checker
-Building the tool is simple. Just issue: 
-`make`
+Building the tool is simple. Just issue:
+* `make`
 
 ### Using Clafer syntax checker
 
 Clafer syntax checker does not support any options and simply expects model files as argument. 
-`./claferSyntaxChecker [input files...]`
+* `./claferSyntaxChecker [input files...]`
 
 ### Generating parser after changing grammar
 
 After changing grammar (clafer.cf) it is necessary to generate new parser, lexer and other supporting files. [Custom BNFC tool](https://github.com/juodaspaulius/bnfc) is required.
 
 Command to generate parser and other files: 
-`make grammar` 
+* `make grammar` 
 
 
 Clafer References
