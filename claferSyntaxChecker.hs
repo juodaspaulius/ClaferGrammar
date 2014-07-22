@@ -14,7 +14,6 @@ import Data.Either
 
 import Lexclafer
 import Parclafer
-import Skelclafer
 import Printclafer
 import Absclafer
 import ClaferT
