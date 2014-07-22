@@ -48,34 +48,52 @@ import ErrM
  '>=' { PT _ (TS _ 31) }
  '>>' { PT _ (TS _ 32) }
  '?' { PT _ (TS _ 33) }
- '[' { PT _ (TS _ 34) }
- '\\' { PT _ (TS _ 35) }
- ']' { PT _ (TS _ 36) }
- '`' { PT _ (TS _ 37) }
- 'abstract' { PT _ (TS _ 38) }
- 'all' { PT _ (TS _ 39) }
- 'disj' { PT _ (TS _ 40) }
- 'else' { PT _ (TS _ 41) }
- 'enum' { PT _ (TS _ 42) }
- 'if' { PT _ (TS _ 43) }
- 'in' { PT _ (TS _ 44) }
- 'lone' { PT _ (TS _ 45) }
- 'max' { PT _ (TS _ 46) }
- 'min' { PT _ (TS _ 47) }
- 'mux' { PT _ (TS _ 48) }
- 'no' { PT _ (TS _ 49) }
- 'not' { PT _ (TS _ 50) }
- 'one' { PT _ (TS _ 51) }
- 'opt' { PT _ (TS _ 52) }
- 'or' { PT _ (TS _ 53) }
- 'some' { PT _ (TS _ 54) }
- 'sum' { PT _ (TS _ 55) }
- 'then' { PT _ (TS _ 56) }
- 'xor' { PT _ (TS _ 57) }
- '{' { PT _ (TS _ 58) }
- '|' { PT _ (TS _ 59) }
- '||' { PT _ (TS _ 60) }
- '}' { PT _ (TS _ 61) }
+ 'F' { PT _ (TS _ 34) }
+ 'G' { PT _ (TS _ 35) }
+ 'U' { PT _ (TS _ 36) }
+ 'W' { PT _ (TS _ 37) }
+ 'X' { PT _ (TS _ 38) }
+ '[' { PT _ (TS _ 39) }
+ '\\' { PT _ (TS _ 40) }
+ ']' { PT _ (TS _ 41) }
+ '`' { PT _ (TS _ 42) }
+ 'abstract' { PT _ (TS _ 43) }
+ 'after' { PT _ (TS _ 44) }
+ 'all' { PT _ (TS _ 45) }
+ 'and' { PT _ (TS _ 46) }
+ 'before' { PT _ (TS _ 47) }
+ 'between' { PT _ (TS _ 48) }
+ 'disj' { PT _ (TS _ 49) }
+ 'else' { PT _ (TS _ 50) }
+ 'enum' { PT _ (TS _ 51) }
+ 'eventually' { PT _ (TS _ 52) }
+ 'final' { PT _ (TS _ 53) }
+ 'finally' { PT _ (TS _ 54) }
+ 'globally' { PT _ (TS _ 55) }
+ 'if' { PT _ (TS _ 56) }
+ 'in' { PT _ (TS _ 57) }
+ 'initially' { PT _ (TS _ 58) }
+ 'let' { PT _ (TS _ 59) }
+ 'lone' { PT _ (TS _ 60) }
+ 'max' { PT _ (TS _ 61) }
+ 'min' { PT _ (TS _ 62) }
+ 'mux' { PT _ (TS _ 63) }
+ 'next' { PT _ (TS _ 64) }
+ 'no' { PT _ (TS _ 65) }
+ 'not' { PT _ (TS _ 66) }
+ 'one' { PT _ (TS _ 67) }
+ 'opt' { PT _ (TS _ 68) }
+ 'or' { PT _ (TS _ 69) }
+ 'some' { PT _ (TS _ 70) }
+ 'sum' { PT _ (TS _ 71) }
+ 'then' { PT _ (TS _ 72) }
+ 'until' { PT _ (TS _ 73) }
+ 'weakuntil' { PT _ (TS _ 74) }
+ 'xor' { PT _ (TS _ 75) }
+ '{' { PT _ (TS _ 76) }
+ '|' { PT _ (TS _ 77) }
+ '||' { PT _ (TS _ 78) }
+ '}' { PT _ (TS _ 79) }
 
 L_PosInteger { PT _ (T_PosInteger _) }
 L_PosDouble { PT _ (T_PosDouble _) }
@@ -105,7 +123,7 @@ Clafer : Abstract GCard PosIdent Super Card Init Elements { Clafer ((mkCatSpan $
 
 
 Constraint :: { Constraint }
-Constraint : '[' ListExp ']' { Constraint ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3)) (reverse $2) } 
+Constraint : '[' ConstraintExp ']' { Constraint ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3)) $2 } 
 
 
 SoftConstraint :: { SoftConstraint }
@@ -186,11 +204,21 @@ Name :: { Name }
 Name : ListModId { Path ((mkCatSpan $1)) $1 } 
 
 
+ConstraintExp :: { ConstraintExp }
+ConstraintExp : 'final' { FinalClaferExp ((mkTokenSpan $1)) } 
+  | ListExp { ConstrExp ((mkCatSpan $1)) (reverse $1) }
+
+
 Exp :: { Exp }
 Exp : 'all' 'disj' Decl '|' Exp { DeclAllDisj ((mkTokenSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3) >- (mkTokenSpan $4) >- (mkCatSpan $5)) $3 $5 } 
   | 'all' Decl '|' Exp { DeclAll ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $2 $4 }
   | Quant 'disj' Decl '|' Exp { DeclQuantDisj ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3) >- (mkTokenSpan $4) >- (mkCatSpan $5)) $1 $3 $5 }
   | Quant Decl '|' Exp { DeclQuant ((mkCatSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $1 $2 $4 }
+  | Exp1 'before' Exp1 PatternScope { TmpPatBefore ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3) >- (mkCatSpan $4)) $1 $3 $4 }
+  | Exp1 'after' Exp1 PatternScope { TmpPatAfter ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3) >- (mkCatSpan $4)) $1 $3 $4 }
+  | 'initially' Exp1 { TmpInitially ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
+  | 'finally' Exp1 { TmpFinally ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
+  | 'let' ListVarBinding 'in' Exp1 { TmpLet ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $2 $4 }
   | Exp1 {  $1 }
 
 
@@ -222,57 +250,92 @@ Exp5 : Exp5 '&&' Exp6 { EAnd ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $
 
 
 Exp6 :: { Exp }
-Exp6 : '!' Exp7 { ENeg ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 } 
+Exp6 : Exp6 'U' Exp7 { LtlU ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 } 
+  | Exp6 'until' Exp7 { TmpUntil ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
   | Exp7 {  $1 }
 
 
 Exp7 :: { Exp }
-Exp7 : Exp7 '<' Exp8 { ELt ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 } 
-  | Exp7 '>' Exp8 { EGt ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
-  | Exp7 '=' Exp8 { EEq ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
-  | Exp7 '<=' Exp8 { ELte ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
-  | Exp7 '>=' Exp8 { EGte ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
-  | Exp7 '!=' Exp8 { ENeq ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
-  | Exp7 'in' Exp8 { EIn ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
-  | Exp7 'not' 'in' Exp8 { ENin ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $1 $4 }
+Exp7 : Exp7 'W' Exp8 { LtlW ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 } 
+  | Exp7 'weakuntil' Exp8 { TmpWUntil ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
   | Exp8 {  $1 }
 
 
 Exp8 :: { Exp }
-Exp8 : Quant Exp12 { QuantExp ((mkCatSpan $1) >- (mkCatSpan $2)) $1 $2 } 
+Exp8 : 'F' Exp9 { LtlF ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 } 
+  | 'eventually' Exp9 { TmpEventually ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
   | Exp9 {  $1 }
 
 
 Exp9 :: { Exp }
-Exp9 : Exp9 '+' Exp10 { EAdd ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 } 
-  | Exp9 '-' Exp10 { ESub ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
+Exp9 : 'G' Exp10 { LtlG ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 } 
+  | 'globally' Exp10 { TmpGlobally ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
   | Exp10 {  $1 }
 
 
 Exp10 :: { Exp }
-Exp10 : Exp10 '*' Exp11 { EMul ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 } 
-  | Exp10 '/' Exp11 { EDiv ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
+Exp10 : 'X' Exp12 { LtlX ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 } 
+  | 'next' Exp12 { TmpNext ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
   | Exp11 {  $1 }
 
 
-Exp11 :: { Exp }
-Exp11 : 'sum' Exp12 { ESumSetExp ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 } 
-  | '#' Exp12 { ECSetExp ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
-  | '-' Exp12 { EMinExp ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
-  | Exp12 {  $1 }
-
-
 Exp12 :: { Exp }
-Exp12 : 'if' Exp12 'then' Exp12 'else' Exp13 { EImpliesElse ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4) >- (mkTokenSpan $5) >- (mkCatSpan $6)) $2 $4 $6 } 
+Exp12 : '!' Exp13 { ENeg ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 } 
   | Exp13 {  $1 }
 
 
 Exp13 :: { Exp }
-Exp13 : PosInteger { EInt ((mkCatSpan $1)) $1 } 
+Exp13 : Exp13 '<' Exp14 { ELt ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 } 
+  | Exp13 '>' Exp14 { EGt ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
+  | Exp13 '=' Exp14 { EEq ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
+  | Exp13 '<=' Exp14 { ELte ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
+  | Exp13 '>=' Exp14 { EGte ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
+  | Exp13 '!=' Exp14 { ENeq ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
+  | Exp13 'in' Exp14 { EIn ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
+  | Exp13 'not' 'in' Exp14 { ENin ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $1 $4 }
+  | Exp14 {  $1 }
+
+
+Exp14 :: { Exp }
+Exp14 : Quant Exp18 { QuantExp ((mkCatSpan $1) >- (mkCatSpan $2)) $1 $2 } 
+  | Exp15 {  $1 }
+
+
+Exp15 :: { Exp }
+Exp15 : Exp15 '+' Exp16 { EAdd ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 } 
+  | Exp15 '-' Exp16 { ESub ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
+  | Exp16 {  $1 }
+
+
+Exp16 :: { Exp }
+Exp16 : Exp16 '*' Exp17 { EMul ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 } 
+  | Exp16 '/' Exp17 { EDiv ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
+  | Exp17 {  $1 }
+
+
+Exp17 :: { Exp }
+Exp17 : 'sum' Exp18 { ESumSetExp ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 } 
+  | '#' Exp18 { ECSetExp ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
+  | '-' Exp18 { EMinExp ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
+  | Exp18 {  $1 }
+
+
+Exp18 :: { Exp }
+Exp18 : 'if' Exp18 'then' Exp18 'else' Exp19 { EImpliesElse ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4) >- (mkTokenSpan $5) >- (mkCatSpan $6)) $2 $4 $6 } 
+  | Exp19 {  $1 }
+
+
+Exp19 :: { Exp }
+Exp19 : PosInteger { EInt ((mkCatSpan $1)) $1 } 
   | PosDouble { EDouble ((mkCatSpan $1)) $1 }
   | PosString { EStr ((mkCatSpan $1)) $1 }
   | SetExp { ESetExp ((mkCatSpan $1)) $1 }
   | '(' Exp ')' {  $2 }
+
+
+PatternScope :: { PatternScope }
+PatternScope : 'between' Exp 'and' Exp { PatScopeBetween ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $2 $4 } 
+  | 'after' Exp 'until' Exp { PatScopeUntil ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $2 $4 }
 
 
 SetExp :: { SetExp }
@@ -315,6 +378,10 @@ Decl :: { Decl }
 Decl : ListLocId ':' SetExp { Decl ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 } 
 
 
+VarBinding :: { VarBinding }
+VarBinding : LocId '=' Name { VarBinding ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 } 
+
+
 Quant :: { Quant }
 Quant : 'no' { QuantNo ((mkTokenSpan $1)) } 
   | 'lone' { QuantLone ((mkTokenSpan $1)) }
@@ -354,6 +421,11 @@ ListExp : {- empty -} { []  }
   | ListExp Exp { flip (:)  $1 $2 }
 
 
+ListVarBinding :: { [VarBinding] }
+ListVarBinding : VarBinding { (:[])  $1 } 
+  | VarBinding ',' ListVarBinding { (:)  $1 $3 }
+
+
 ListLocId :: { [LocId] }
 ListLocId : LocId { (:[])  $1 } 
   | LocId ';' ListLocId { (:)  $1 $3 }
@@ -362,6 +434,10 @@ ListLocId : LocId { (:[])  $1 }
 ListModId :: { [ModId] }
 ListModId : ModId { (:[])  $1 } 
   | ModId '\\' ListModId { (:)  $1 $3 }
+
+
+Exp11 :: { Exp }
+Exp11 : Exp12 {  $1 } 
 
 
 

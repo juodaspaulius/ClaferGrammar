@@ -117,7 +117,7 @@ instance Print Clafer where
 
 instance Print Constraint where
   prt i e = case e of
-   Constraint _ exps -> prPrec i 0 (concatD [doc (showString "[") , prt 0 exps , doc (showString "]")])
+   Constraint _ constraintexp -> prPrec i 0 (concatD [doc (showString "[") , prt 0 constraintexp , doc (showString "]")])
 
 
 instance Print SoftConstraint where
@@ -215,12 +215,23 @@ instance Print Name where
    Path _ modids -> prPrec i 0 (concatD [prt 0 modids])
 
 
+instance Print ConstraintExp where
+  prt i e = case e of
+   FinalClaferExp _  -> prPrec i 0 (concatD [doc (showString "final")])
+   ConstrExp _ exps -> prPrec i 0 (concatD [prt 0 exps])
+
+
 instance Print Exp where
   prt i e = case e of
    DeclAllDisj _ decl exp -> prPrec i 0 (concatD [doc (showString "all") , doc (showString "disj") , prt 0 decl , doc (showString "|") , prt 0 exp])
    DeclAll _ decl exp -> prPrec i 0 (concatD [doc (showString "all") , prt 0 decl , doc (showString "|") , prt 0 exp])
    DeclQuantDisj _ quant decl exp -> prPrec i 0 (concatD [prt 0 quant , doc (showString "disj") , prt 0 decl , doc (showString "|") , prt 0 exp])
    DeclQuant _ quant decl exp -> prPrec i 0 (concatD [prt 0 quant , prt 0 decl , doc (showString "|") , prt 0 exp])
+   TmpPatBefore _ exp0 exp patternscope -> prPrec i 0 (concatD [prt 1 exp0 , doc (showString "before") , prt 1 exp , prt 0 patternscope])
+   TmpPatAfter _ exp0 exp patternscope -> prPrec i 0 (concatD [prt 1 exp0 , doc (showString "after") , prt 1 exp , prt 0 patternscope])
+   TmpInitially _ exp -> prPrec i 0 (concatD [doc (showString "initially") , prt 1 exp])
+   TmpFinally _ exp -> prPrec i 0 (concatD [doc (showString "finally") , prt 1 exp])
+   TmpLet _ varbindings exp -> prPrec i 0 (concatD [doc (showString "let") , prt 0 varbindings , doc (showString "in") , prt 1 exp])
    EGMax _ exp -> prPrec i 1 (concatD [doc (showString "max") , prt 2 exp])
    EGMin _ exp -> prPrec i 1 (concatD [doc (showString "min") , prt 2 exp])
    EIff _ exp0 exp -> prPrec i 1 (concatD [prt 1 exp0 , doc (showString "<=>") , prt 2 exp])
@@ -228,32 +239,48 @@ instance Print Exp where
    EOr _ exp0 exp -> prPrec i 3 (concatD [prt 3 exp0 , doc (showString "||") , prt 4 exp])
    EXor _ exp0 exp -> prPrec i 4 (concatD [prt 4 exp0 , doc (showString "xor") , prt 5 exp])
    EAnd _ exp0 exp -> prPrec i 5 (concatD [prt 5 exp0 , doc (showString "&&") , prt 6 exp])
-   ENeg _ exp -> prPrec i 6 (concatD [doc (showString "!") , prt 7 exp])
-   ELt _ exp0 exp -> prPrec i 7 (concatD [prt 7 exp0 , doc (showString "<") , prt 8 exp])
-   EGt _ exp0 exp -> prPrec i 7 (concatD [prt 7 exp0 , doc (showString ">") , prt 8 exp])
-   EEq _ exp0 exp -> prPrec i 7 (concatD [prt 7 exp0 , doc (showString "=") , prt 8 exp])
-   ELte _ exp0 exp -> prPrec i 7 (concatD [prt 7 exp0 , doc (showString "<=") , prt 8 exp])
-   EGte _ exp0 exp -> prPrec i 7 (concatD [prt 7 exp0 , doc (showString ">=") , prt 8 exp])
-   ENeq _ exp0 exp -> prPrec i 7 (concatD [prt 7 exp0 , doc (showString "!=") , prt 8 exp])
-   EIn _ exp0 exp -> prPrec i 7 (concatD [prt 7 exp0 , doc (showString "in") , prt 8 exp])
-   ENin _ exp0 exp -> prPrec i 7 (concatD [prt 7 exp0 , doc (showString "not") , doc (showString "in") , prt 8 exp])
-   QuantExp _ quant exp -> prPrec i 8 (concatD [prt 0 quant , prt 12 exp])
-   EAdd _ exp0 exp -> prPrec i 9 (concatD [prt 9 exp0 , doc (showString "+") , prt 10 exp])
-   ESub _ exp0 exp -> prPrec i 9 (concatD [prt 9 exp0 , doc (showString "-") , prt 10 exp])
-   EMul _ exp0 exp -> prPrec i 10 (concatD [prt 10 exp0 , doc (showString "*") , prt 11 exp])
-   EDiv _ exp0 exp -> prPrec i 10 (concatD [prt 10 exp0 , doc (showString "/") , prt 11 exp])
-   ESumSetExp _ exp -> prPrec i 11 (concatD [doc (showString "sum") , prt 12 exp])
-   ECSetExp _ exp -> prPrec i 11 (concatD [doc (showString "#") , prt 12 exp])
-   EMinExp _ exp -> prPrec i 11 (concatD [doc (showString "-") , prt 12 exp])
-   EImpliesElse _ exp0 exp1 exp -> prPrec i 12 (concatD [doc (showString "if") , prt 12 exp0 , doc (showString "then") , prt 12 exp1 , doc (showString "else") , prt 13 exp])
-   EInt _ posinteger -> prPrec i 13 (concatD [prt 0 posinteger])
-   EDouble _ posdouble -> prPrec i 13 (concatD [prt 0 posdouble])
-   EStr _ posstring -> prPrec i 13 (concatD [prt 0 posstring])
-   ESetExp _ setexp -> prPrec i 13 (concatD [prt 0 setexp])
+   LtlU _ exp0 exp -> prPrec i 6 (concatD [prt 6 exp0 , doc (showString "U") , prt 7 exp])
+   TmpUntil _ exp0 exp -> prPrec i 6 (concatD [prt 6 exp0 , doc (showString "until") , prt 7 exp])
+   LtlW _ exp0 exp -> prPrec i 7 (concatD [prt 7 exp0 , doc (showString "W") , prt 8 exp])
+   TmpWUntil _ exp0 exp -> prPrec i 7 (concatD [prt 7 exp0 , doc (showString "weakuntil") , prt 8 exp])
+   LtlF _ exp -> prPrec i 8 (concatD [doc (showString "F") , prt 9 exp])
+   TmpEventually _ exp -> prPrec i 8 (concatD [doc (showString "eventually") , prt 9 exp])
+   LtlG _ exp -> prPrec i 9 (concatD [doc (showString "G") , prt 10 exp])
+   TmpGlobally _ exp -> prPrec i 9 (concatD [doc (showString "globally") , prt 10 exp])
+   LtlX _ exp -> prPrec i 10 (concatD [doc (showString "X") , prt 12 exp])
+   TmpNext _ exp -> prPrec i 10 (concatD [doc (showString "next") , prt 12 exp])
+   ENeg _ exp -> prPrec i 12 (concatD [doc (showString "!") , prt 13 exp])
+   ELt _ exp0 exp -> prPrec i 13 (concatD [prt 13 exp0 , doc (showString "<") , prt 14 exp])
+   EGt _ exp0 exp -> prPrec i 13 (concatD [prt 13 exp0 , doc (showString ">") , prt 14 exp])
+   EEq _ exp0 exp -> prPrec i 13 (concatD [prt 13 exp0 , doc (showString "=") , prt 14 exp])
+   ELte _ exp0 exp -> prPrec i 13 (concatD [prt 13 exp0 , doc (showString "<=") , prt 14 exp])
+   EGte _ exp0 exp -> prPrec i 13 (concatD [prt 13 exp0 , doc (showString ">=") , prt 14 exp])
+   ENeq _ exp0 exp -> prPrec i 13 (concatD [prt 13 exp0 , doc (showString "!=") , prt 14 exp])
+   EIn _ exp0 exp -> prPrec i 13 (concatD [prt 13 exp0 , doc (showString "in") , prt 14 exp])
+   ENin _ exp0 exp -> prPrec i 13 (concatD [prt 13 exp0 , doc (showString "not") , doc (showString "in") , prt 14 exp])
+   QuantExp _ quant exp -> prPrec i 14 (concatD [prt 0 quant , prt 18 exp])
+   EAdd _ exp0 exp -> prPrec i 15 (concatD [prt 15 exp0 , doc (showString "+") , prt 16 exp])
+   ESub _ exp0 exp -> prPrec i 15 (concatD [prt 15 exp0 , doc (showString "-") , prt 16 exp])
+   EMul _ exp0 exp -> prPrec i 16 (concatD [prt 16 exp0 , doc (showString "*") , prt 17 exp])
+   EDiv _ exp0 exp -> prPrec i 16 (concatD [prt 16 exp0 , doc (showString "/") , prt 17 exp])
+   ESumSetExp _ exp -> prPrec i 17 (concatD [doc (showString "sum") , prt 18 exp])
+   ECSetExp _ exp -> prPrec i 17 (concatD [doc (showString "#") , prt 18 exp])
+   EMinExp _ exp -> prPrec i 17 (concatD [doc (showString "-") , prt 18 exp])
+   EImpliesElse _ exp0 exp1 exp -> prPrec i 18 (concatD [doc (showString "if") , prt 18 exp0 , doc (showString "then") , prt 18 exp1 , doc (showString "else") , prt 19 exp])
+   EInt _ posinteger -> prPrec i 19 (concatD [prt 0 posinteger])
+   EDouble _ posdouble -> prPrec i 19 (concatD [prt 0 posdouble])
+   EStr _ posstring -> prPrec i 19 (concatD [prt 0 posstring])
+   ESetExp _ setexp -> prPrec i 19 (concatD [prt 0 setexp])
 
   prtList es = case es of
    [] -> (concatD [])
    x:xs -> (concatD [prt 0 x , prt 0 xs])
+
+instance Print PatternScope where
+  prt i e = case e of
+   PatScopeBetween _ exp0 exp -> prPrec i 0 (concatD [doc (showString "between") , prt 0 exp0 , doc (showString "and") , prt 0 exp])
+   PatScopeUntil _ exp0 exp -> prPrec i 0 (concatD [doc (showString "after") , prt 0 exp0 , doc (showString "until") , prt 0 exp])
+
 
 instance Print SetExp where
   prt i e = case e of
@@ -271,6 +298,14 @@ instance Print Decl where
   prt i e = case e of
    Decl _ locids setexp -> prPrec i 0 (concatD [prt 0 locids , doc (showString ":") , prt 0 setexp])
 
+
+instance Print VarBinding where
+  prt i e = case e of
+   VarBinding _ locid name -> prPrec i 0 (concatD [prt 0 locid , doc (showString "=") , prt 0 name])
+
+  prtList es = case es of
+   [x] -> (concatD [prt 0 x])
+   x:xs -> (concatD [prt 0 x , doc (showString ",") , prt 0 xs])
 
 instance Print Quant where
   prt i e = case e of

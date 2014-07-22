@@ -49,7 +49,7 @@ data Clafer =
   deriving (Eq,Ord,Show,Read)
 
 data Constraint =
-   Constraint Span [Exp]
+   Constraint Span ConstraintExp
   deriving (Eq,Ord,Show,Read)
 
 data SoftConstraint =
@@ -130,11 +130,21 @@ data Name =
    Path Span [ModId]
   deriving (Eq,Ord,Show,Read)
 
+data ConstraintExp =
+   FinalClaferExp Span
+ | ConstrExp Span [Exp]
+  deriving (Eq,Ord,Show,Read)
+
 data Exp =
    DeclAllDisj Span Decl Exp
  | DeclAll Span Decl Exp
  | DeclQuantDisj Span Quant Decl Exp
  | DeclQuant Span Quant Decl Exp
+ | TmpPatBefore Span Exp Exp PatternScope
+ | TmpPatAfter Span Exp Exp PatternScope
+ | TmpInitially Span Exp
+ | TmpFinally Span Exp
+ | TmpLet Span [VarBinding] Exp
  | EGMax Span Exp
  | EGMin Span Exp
  | EIff Span Exp Exp
@@ -142,6 +152,16 @@ data Exp =
  | EOr Span Exp Exp
  | EXor Span Exp Exp
  | EAnd Span Exp Exp
+ | LtlU Span Exp Exp
+ | TmpUntil Span Exp Exp
+ | LtlW Span Exp Exp
+ | TmpWUntil Span Exp Exp
+ | LtlF Span Exp
+ | TmpEventually Span Exp
+ | LtlG Span Exp
+ | TmpGlobally Span Exp
+ | LtlX Span Exp
+ | TmpNext Span Exp
  | ENeg Span Exp
  | ELt Span Exp Exp
  | EGt Span Exp Exp
@@ -166,6 +186,11 @@ data Exp =
  | ESetExp Span SetExp
   deriving (Eq,Ord,Show,Read)
 
+data PatternScope =
+   PatScopeBetween Span Exp Exp
+ | PatScopeUntil Span Exp Exp
+  deriving (Eq,Ord,Show,Read)
+
 data SetExp =
    Union Span SetExp SetExp
  | UnionCom Span SetExp SetExp
@@ -179,6 +204,10 @@ data SetExp =
 
 data Decl =
    Decl Span [LocId] SetExp
+  deriving (Eq,Ord,Show,Read)
+
+data VarBinding =
+   VarBinding Span LocId Name
   deriving (Eq,Ord,Show,Read)
 
 data Quant =
@@ -277,11 +306,20 @@ instance Spannable ExInteger where
 instance Spannable Name where
   getSpan ( Path s _ ) = s
 
+instance Spannable ConstraintExp where
+  getSpan ( FinalClaferExp s ) = s
+  getSpan ( ConstrExp s _ ) = s
+
 instance Spannable Exp where
   getSpan ( DeclAllDisj s _ _ ) = s
   getSpan ( DeclAll s _ _ ) = s
   getSpan ( DeclQuantDisj s _ _ _ ) = s
   getSpan ( DeclQuant s _ _ _ ) = s
+  getSpan ( TmpPatBefore s _ _ _ ) = s
+  getSpan ( TmpPatAfter s _ _ _ ) = s
+  getSpan ( TmpInitially s _ ) = s
+  getSpan ( TmpFinally s _ ) = s
+  getSpan ( TmpLet s _ _ ) = s
   getSpan ( EGMax s _ ) = s
   getSpan ( EGMin s _ ) = s
   getSpan ( EIff s _ _ ) = s
@@ -289,6 +327,16 @@ instance Spannable Exp where
   getSpan ( EOr s _ _ ) = s
   getSpan ( EXor s _ _ ) = s
   getSpan ( EAnd s _ _ ) = s
+  getSpan ( LtlU s _ _ ) = s
+  getSpan ( TmpUntil s _ _ ) = s
+  getSpan ( LtlW s _ _ ) = s
+  getSpan ( TmpWUntil s _ _ ) = s
+  getSpan ( LtlF s _ ) = s
+  getSpan ( TmpEventually s _ ) = s
+  getSpan ( LtlG s _ ) = s
+  getSpan ( TmpGlobally s _ ) = s
+  getSpan ( LtlX s _ ) = s
+  getSpan ( TmpNext s _ ) = s
   getSpan ( ENeg s _ ) = s
   getSpan ( ELt s _ _ ) = s
   getSpan ( EGt s _ _ ) = s
@@ -312,6 +360,10 @@ instance Spannable Exp where
   getSpan ( EStr s _ ) = s
   getSpan ( ESetExp s _ ) = s
 
+instance Spannable PatternScope where
+  getSpan ( PatScopeBetween s _ _ ) = s
+  getSpan ( PatScopeUntil s _ _ ) = s
+
 instance Spannable SetExp where
   getSpan ( Union s _ _ ) = s
   getSpan ( UnionCom s _ _ ) = s
@@ -324,6 +376,9 @@ instance Spannable SetExp where
 
 instance Spannable Decl where
   getSpan ( Decl s _ _ ) = s
+
+instance Spannable VarBinding where
+  getSpan ( VarBinding s _ _ ) = s
 
 instance Spannable Quant where
   getSpan ( QuantNo s ) = s
