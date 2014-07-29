@@ -21,16 +21,15 @@
  SOFTWARE.
 -}
 -- | Resolves indentation into explicit nesting using { }
-module LayoutResolver where
+module Language.Clafer.Front.LayoutResolver where
 
 -- very simple layout resolver
 import Control.Monad.State
 import Data.Functor.Identity (Identity)
-{-import Common-}
-import ClaferT
+import Language.Clafer.Common
+import Language.ClaferT
 
-import Absclafer
-import Lexclafer
+import Language.Clafer.Front.Lexclafer
 import Data.Maybe
 
 data LayEnv = LayEnv {
@@ -196,7 +195,7 @@ addNewLines' n (t0:t1:ts)
     addNewLines' (n - 1) (t1:ts) >>= (return . (ExToken t0:))
   | isNewLine t0 t1  = addNewLines' n (t1:ts) >>= (return . (ExToken t0:) . (NewLine (column t1, n):))
   | otherwise        = addNewLines' n (t1:ts) >>= (return . (ExToken t0:))
-addNewLines' _ _ = throwErr (ClaferErr "Function addNewLines' from LayoutResolver was given invalid arguments") -- This should never happen!
+addNewLines' _ _ = throwErr (ClaferErr "Function addNewLines' from LayoutResolver was given invalid arguments" :: CErr Span) -- This should never happen!
 
 
 adjust :: (Monad m) => [Token] -> ClaferT m [Token]

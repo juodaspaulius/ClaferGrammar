@@ -2,6 +2,7 @@
 module Main where
 
 
+import Prelude hiding (writeFile, print)
 import System.IO ( stdin, hGetContents )
 import System.Environment ( getArgs, getProgName )
 import System.Exit ( exitFailure, exitSuccess )
@@ -12,15 +13,16 @@ import Data.Maybe
 import Data.List.Split
 import Data.Either
 
-import Lexclafer
-import Parclafer
-import Printclafer
-import Absclafer
-import ClaferT
-import LayoutResolver
+import Language.Clafer.Front.Absclafer
+import Language.Clafer.Front.Lexclafer
+import Language.Clafer.Front.Parclafer
+import Language.Clafer.Front.Printclafer
+import Language.Clafer.Front.Absclafer
+import Language.Clafer.Front.LayoutResolver
+import Language.Clafer.Front.ErrM
 
-
-import ErrM
+import Language.ClaferT
+import Language.Clafer.ClaferArgs
 
 type ParseFun a = [Token] -> Err a
 
@@ -34,9 +36,10 @@ putStrV v s = if v > 1 then putStrLn s else return ()
 run :: String -> IO ()
 run input =
   do
-    result <- runClaferT $ parse input
+    result <- runClaferT args $ parse input
     result `cth` handleErrs
   where
+  args = defaultClaferArgs
   cth (Left err) f = f err
   cth (Right r)  _ = handleSuccess r
   handleSuccess tree = do
@@ -78,6 +81,7 @@ main = do args <- getArgs
             [] -> hGetContents stdin >>= run
             fs -> mapM_ runFile fs
 
+
 parse :: (Monad m) => String -> ClaferT m Module
 parse s = do
     tokens <- resolveLayout $ myLexer s
@@ -85,11 +89,6 @@ parse s = do
 
   --  (>>= \x -> (-> return . pModule) x) . resolveLayout . myLexer
   --  (>>= (return . pModule)) . resolveLayout . myLexer
-
--- | Converts one Err. liftParseErrs is better if you want to report multiple errors.
--- | This method will only report one before ceasing execution.
-liftParseErr :: Monad m => Err a -> ClaferT m a
-liftParseErr e = head `liftM` liftParseErrs [e]
 
 -- | Converts the Err monads (created by the BNFC parser generator) to ClaferT
 liftParseErrs :: Monad m => [Err a] -> ClaferT m [a]
@@ -104,6 +103,9 @@ liftParseErrs e =
   extract frgId (Bad p s) =
     do
       -- Bad maps to ParseErr
-      return $ Left $ ParseErr (ErrPos frgId p p) s
+      return $ Left $ ParseErr (ErrFragPos frgId p) s
 
-
+-- | Converts one Err. liftParseErrs is better if you want to report multiple errors.
+-- | This method will only report one before ceasing execution.
+liftParseErr :: Monad m => Err a -> ClaferT m a
+liftParseErr e = head `liftM` liftParseErrs [e]

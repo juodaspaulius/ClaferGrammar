@@ -2,14 +2,14 @@
 -- Copyright (C) 2004  Author:  Aarne Ranta
 
 -- This file comes with NO WARRANTY and may be used FOR ANY PURPOSE.
-module ErrM where
+module Language.Clafer.Front.ErrM where
 
 -- the Error monad: like Maybe type with error msgs
 
 import Control.Monad (MonadPlus(..), liftM)
 import Control.Applicative (Applicative(..), Alternative(..))
 
-import Absclafer
+import Language.Clafer.Front.Absclafer
 data Err a = Ok a | Bad Pos String
   deriving (Read, Show, Eq, Ord)
 
