@@ -92,9 +92,7 @@ Test-Suite test-suite
                     test-framework-hunit >= 0.3.0.1, 
                     test-framework-quickcheck2 >= 0.3.0.2,
                     test-framework-th >= 0.2.4,
-                    text >= 0.11.3.1,
-
-                    clafer == 0.3.7
+                    text >= 0.11.3.1
 
     if os(windows)
         build-depends: HaXml == 1.24
@@ -103,7 +101,7 @@ Test-Suite test-suite
 
     ghc-options:    -Wall -fno-warn-unused-do-bind -fno-warn-orphans
 
-    other-modules:  Paths_clafer,
+    other-modules:  Paths_claferSyntaxer,
                     Functions,
                     Suite.Example,
                     Suite.Positive,
