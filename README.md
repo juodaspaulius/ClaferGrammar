@@ -7,17 +7,19 @@ Currently repository includes syntax checker tool which checks if test models co
 
 Grammar is defined in clafer.cf and follows BNFC format.
 
-Clafer Syntax Checker
+ClaferSyntaxer
 =============
 
 ### Building Clafer syntax checker
-Building the tool is simple. Just issue:
+Building the tool follows same steps as Clafer Compiler. Just issue:
+* `make init`
 * `make`
+* `make install to=<Installation Path>`
 
 ### Using Clafer syntax checker
 
 Clafer syntax checker does not support any options and simply expects model files as argument. 
-* `./claferSyntaxChecker [input files...]`
+* `claferSyntaxer [input files...]`
 
 ### Generating parser after changing grammar
 
