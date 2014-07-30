@@ -15,11 +15,18 @@ Module.         Module ::= [Declaration] ;
 EnumDecl.       Declaration ::= "enum" PosIdent "=" [EnumId] ;
 ElementDecl.    Declaration ::= Element ;
 
-Clafer.         Clafer ::= Abstract GCard PosIdent Super Card Init Elements ;
-Constraint.     Constraint ::= "[" [Exp] "]" ;
+Clafer.         Clafer ::= Abstract TempModifier GCard PosIdent Super Card Init Transition Elements ;
+Constraint.     Constraint ::= "[" ConstraintExp "]" ;
 SoftConstraint. SoftConstraint ::= "(" [Exp] ")";
 Goal.   		Goal ::= "<<" [Exp] ">>" ;
 
+NoTempModifier. TempModifier ::= ; 
+Initial.        TempModifier ::= "initial";
+Final.          TempModifier ::= "final";
+
+
+TransitionEmpty.           Transition ::= ;
+Transition.                Transition ::= TransArrow Exp;
 
 AbstractEmpty.  Abstract ::= ;
 Abstract.       Abstract ::= "abstract" ;
@@ -68,39 +75,71 @@ ExIntegerNum.   ExInteger ::= PosInteger ;
 
 Path.           Name ::= [ModId] ;
 
-DeclAllDisj.    Exp   ::= "all" "disj" Decl "|" Exp ;
-DeclAll.        Exp   ::= "all"        Decl "|" Exp ;
-DeclQuantDisj.  Exp   ::= Quant "disj" Decl "|" Exp ;
-DeclQuant.      Exp   ::= Quant        Decl "|" Exp ;
-EGMax.          Exp1  ::= "max" Exp2 ;
-EGMin.          Exp1  ::= "min" Exp2 ;
-EIff.           Exp1  ::= Exp1 "<=>" Exp2 ;
-EImplies.       Exp2  ::= Exp2 "=>"  Exp3 ;
-EOr.            Exp3  ::= Exp3 "||"  Exp4 ;
-EXor.           Exp4  ::= Exp4 "xor" Exp5 ;
-EAnd.           Exp5  ::= Exp5 "&&"  Exp6 ;
-ENeg.           Exp6  ::= "!" Exp7 ;
-ELt.            Exp7  ::= Exp7 "<"  Exp8 ;
-EGt.            Exp7  ::= Exp7 ">"  Exp8 ;
-EEq.            Exp7  ::= Exp7 "="  Exp8 ;
-ELte.           Exp7  ::= Exp7 "<=" Exp8 ;
-EGte.           Exp7  ::= Exp7 ">=" Exp8 ;
-ENeq.           Exp7  ::= Exp7 "!=" Exp8 ;
-EIn.            Exp7  ::= Exp7 "in" Exp8 ;
-ENin.           Exp7  ::= Exp7 "not" "in" Exp8 ;
-QuantExp.       Exp8  ::= Quant Exp12 ;
-EAdd.           Exp9  ::= Exp9  "+" Exp10 ;
-ESub.           Exp9  ::= Exp9  "-" Exp10 ;
-EMul.           Exp10 ::= Exp10 "*" Exp11 ;
-EDiv.           Exp10 ::= Exp10 "/" Exp11 ;
-ESumSetExp.     Exp11 ::= "sum" Exp12;
-ECSetExp.       Exp11 ::= "#" Exp12 ;
-EMinExp.        Exp11 ::= "-" Exp12 ;
-EImpliesElse.   Exp12 ::= "if" Exp12 "then" Exp12 "else" Exp13 ;
-EInt.           Exp13 ::= PosInteger ;
-EDouble.        Exp13 ::= PosDouble ;
-EStr.           Exp13 ::= PosString ;
-ESetExp.        Exp13 ::= SetExp ;
+FinalClaferExp. ConstraintExp ::= "final" ;
+ConstrExp.      ConstraintExp ::= [Exp] ;
+
+-- Transition expressions are right associative and has lowest precedence
+TransitionExp.  Exp ::= Exp1 TransArrow Exp ;
+DeclAllDisj.    Exp1   ::= "all" "disj" Decl "|" Exp1 ;
+DeclAll.        Exp1   ::= "all"        Decl "|" Exp1 ;
+DeclQuantDisj.  Exp1   ::= Quant "disj" Decl "|" Exp1 ;
+DeclQuant.      Exp1   ::= Quant        Decl "|" Exp1 ;
+LetExp.         Exp1 ::= "let" VarBinding "in" Exp1;
+TmpPatBefore.   Exp2 ::= Exp3 "before" Exp3 PatternScope;
+TmpPatAfter.    Exp2 ::= Exp3 "after" Exp3 PatternScope;
+TmpInitially.   Exp2 ::= "initially" Exp3;
+TmpFinally.     Exp2 ::= "finally" Exp3;
+EGMax.          Exp3  ::= "max" Exp4 ;
+EGMin.          Exp3  ::= "min" Exp4 ;
+EIff.           Exp3  ::= Exp3 "<=>" Exp4 ;
+EImplies.       Exp4  ::= Exp4 "=>"  Exp5 ;
+EOr.            Exp5  ::= Exp5 "||"  Exp6 ;
+EXor.           Exp6  ::= Exp6 "xor" Exp7 ;
+EAnd.           Exp7  ::= Exp7 "&&"  Exp8 ;
+LtlU.           Exp8  ::= Exp8 "U"  Exp9 ;
+TmpUntil.       Exp8  ::= Exp8 "until"  Exp9 ;
+LtlW.           Exp9  ::= Exp9 "W"  Exp10 ;
+TmpWUntil.      Exp9  ::= Exp9 "weakuntil"  Exp10 ;
+LtlF.           Exp10  ::= "F"  Exp11 ;
+TmpEventually.  Exp10  ::= "eventually"  Exp11 ;
+LtlG.           Exp11  ::= "G"  Exp12 ;
+TmpGlobally.    Exp11  ::= "globally"  Exp12 ;
+LtlX.           Exp12  ::= "X"  Exp14 ;
+TmpNext.        Exp12  ::= "next"  Exp14 ;
+ENeg.           Exp14  ::= "!" Exp15 ;
+ELt.            Exp15  ::= Exp15 "<"  Exp16 ;
+EGt.            Exp15  ::= Exp15 ">"  Exp16 ;
+EEq.            Exp15  ::= Exp15 "="  Exp16 ;
+ELte.           Exp15  ::= Exp15 "<=" Exp16 ;
+EGte.           Exp15  ::= Exp15 ">=" Exp16 ;
+ENeq.           Exp15  ::= Exp15 "!=" Exp16 ;
+EIn.            Exp15  ::= Exp15 "in" Exp16 ;
+ENin.           Exp15  ::= Exp15 "not" "in" Exp16 ;
+QuantExp.       Exp16  ::= Quant Exp20 ;
+EAdd.           Exp17  ::= Exp17  "+" Exp18 ;
+ESub.           Exp17  ::= Exp17  "-" Exp18 ;
+EMul.           Exp18 ::= Exp18 "*" Exp19 ;
+EDiv.           Exp18 ::= Exp18 "/" Exp19 ;
+ESumSetExp.     Exp19 ::= "sum" Exp20;
+ECSetExp.       Exp19 ::= "#" Exp20 ;
+EMinExp.        Exp19 ::= "-" Exp20 ;
+EImpliesElse.   Exp20 ::= "if" Exp20 "then" Exp20 "else" Exp21 ;
+EInt.           Exp21 ::= PosInteger ;
+EDouble.        Exp21 ::= PosDouble ;
+EStr.           Exp21 ::= PosString ;
+ESetExp.        Exp21 ::= SetExp ;
+
+TransGuard.      TransGuard ::= Exp1;
+
+AsyncTransArrow.           TransArrow ::= "-->";
+GuardedAsyncTransArrow.    TransArrow ::= "-[" TransGuard "]->";
+SyncTransArrow.            TransArrow ::= "==>";
+GuardedSyncTransArrow.     TransArrow ::= "=[" TransGuard "]=>";
+NextTransArrow.            TransArrow ::= "##>";
+GuardedNextTransArrow.     TransArrow ::= "#[" TransGuard "]#>";
+
+PatScopeBetween.  PatternScope ::= "between" Exp "and" Exp ;
+PatScopeUntil.    PatternScope ::= "after" Exp "until" Exp ;
 
 Union.          SetExp  ::= SetExp  "++" SetExp1 ;
 UnionCom.       SetExp  ::= SetExp  ","  SetExp1 ;
@@ -113,8 +152,9 @@ ClaferId.       SetExp6 ::= Name ;
 
 Decl.           Decl ::= [LocId] ":" SetExp ;
 
+VarBinding.     VarBinding ::= LocId "=" Name ;
+
 QuantNo.        Quant ::= "no" ;
-QuantNot.		Quant ::= "not" ;
 QuantLone.      Quant ::= "lone" ;
 QuantOne.       Quant ::= "one" ;
 QuantSome.      Quant ::= "some" ;
@@ -130,7 +170,7 @@ separator           Exp         ""  ;
 separator  nonempty LocId       ";" ;
 separator  nonempty ModId       "\\" ;
 
-coercions Exp 13 ;
+coercions Exp 21 ;
 coercions SetExp 6 ;
 
 position token PosInteger (digit+) ;
