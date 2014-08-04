@@ -4,3 +4,7 @@ a
  b ?
   c ?
  [temp c]
+
+// Rao: 2014-08-04: This should fail as 'temp' is not a recongnised keyword.   
+// but it is parsing correctly, which is an error.
+
