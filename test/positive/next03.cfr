@@ -1,0 +1,12 @@
+// behavioral clafer test for next or X temporal operator
+
+a
+ b ?
+  c ?
+  [X !b]
+  [X X b]
+
+
+// Rao: 2014-08-04: Failed to parse at second X 
+// Parse failed at line 7 column 6... before X b ] }
+

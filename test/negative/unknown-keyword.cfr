@@ -1,0 +1,6 @@
+// Negative behavioral clafer test for unknown operator 
+
+a
+ b ?
+  c ?
+ [temp c]
