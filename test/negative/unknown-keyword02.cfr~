@@ -1,9 +1,0 @@
-// behavioral clafer test for default globally or G
-
-a
- b ?
-  c ?
- [temp globally c]
-
-// Rao:  This should fail with error saying unknown keyword or operator.
-// 2014-08-05: But this failes to report error and parses, which is a bug in claferSyntaxer.
