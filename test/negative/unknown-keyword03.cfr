@@ -1,0 +1,15 @@
+// behavioral clafer test for next or X temporal operator
+
+a
+ b ?
+  c ?
+  [temp next c]
+
+
+// Rao: 2014-08-04: This should fail as 'next' is a unary operator   
+// but it is parsing correctly, which is an error.
+// Even if there is a term before 'next', it should be a valid 
+// e.g: k => next c (if k is a clafer) or next next c
+// May be the same applies to other unary operators such as G, and F.
+
+
