@@ -1,0 +1,10 @@
+// Test for negative weakuntil constraint
+
+a
+ b ?
+  c ?
+  d ?
+  [ W d]
+
+
+// Fail to parse as expected 

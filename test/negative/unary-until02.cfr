@@ -1,0 +1,10 @@
+// Test for negative until constraint
+
+a
+ b ?
+  c ?
+  d ?
+  [c until ]
+
+
+// Fail to parse as expected 
