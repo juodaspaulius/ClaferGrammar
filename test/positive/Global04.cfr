@@ -1,0 +1,8 @@
+// behavioral clafer test for default globally or G
+
+a
+ b ?
+  c ?
+ [F G c]
+
+// Rao: This parses without any problems, so good.
