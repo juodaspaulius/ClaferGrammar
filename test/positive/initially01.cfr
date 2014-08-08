@@ -1,0 +1,9 @@
+// Test for initially constraint
+
+a
+ b ?
+  c ?
+  d ?
+  e ?
+  [initially c]
+

@@ -1,0 +1,12 @@
+// Test for negative between and constraint
+
+a
+ b ?
+  c ?
+  d ?
+  e ?
+  [c between d and  ]
+
+// Rao: 08-08-2014: Failed as expected, but it should be checked again as
+// parser failing to parse even postive testcases for between and 
+

@@ -1,0 +1,9 @@
+// Test for negative before constraint
+
+a
+ b ?
+  c ?
+  d ?
+  [c before ]
+
+// Rao: works fine as failed to parse. 

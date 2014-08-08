@@ -1,0 +1,12 @@
+// Test for after until constraint
+
+a
+ b ?
+  c ?
+  d ?
+  e ?
+  [a after d until  ]
+
+// Rao: 08-08-2014: Failed as expected, but it should be checked again as
+// parser failing to parse even postive testcases for after until 
+
