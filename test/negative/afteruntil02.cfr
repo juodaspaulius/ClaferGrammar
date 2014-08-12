@@ -7,6 +7,4 @@ a
   e ?
   [c after until e ]
 
-// Rao: 08-08-2014: Failed as expected, but it should be checked again as
-// parser failing to parse even postive testcases for after until 
 
