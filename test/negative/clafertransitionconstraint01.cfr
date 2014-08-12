@@ -1,0 +1,36 @@
+// Test for negative clafer constraint
+
+a
+ xor b ?
+  	c ==> 
+  	d 
+  	e 
+
+
+/*
+Actually this code is supposed to fail. But surprisingly it passed the parser check.
+Desugared sytax is 
+
+a {
+  xor b ? {
+    c ==> d e 
+  }
+  }
+
+To discuss with Paulius.
+This passes the test because it ignores the missing clafer and takes the next clafer.
+
+Of couse the following case fails as expected as there is no follwing clafer.
+
+a
+ xor b ?
+	d 
+  	e  	
+	c ==> 
+ 
+So How should we handle this case? To discuss in meeting.
+
+
+
+*/
+

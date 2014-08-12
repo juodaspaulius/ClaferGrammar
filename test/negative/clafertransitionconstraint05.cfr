@@ -1,0 +1,11 @@
+// Test for negative clafer constraint
+
+a
+ xor b ?
+  	 --> e
+  	d 
+  	e 
+
+
+
+

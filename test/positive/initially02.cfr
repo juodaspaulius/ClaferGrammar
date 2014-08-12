@@ -20,4 +20,28 @@ a {
   }
 */
 
+/*
+Rao: 20140811: As per Andrzej's notes on Traffic Light, the above clafer code should desugars to 
+
+a {
+  b ? {
+    c ? {
+      [initially c]
+    }
+    d ? e ? 
+  }
+  }
+
+But the result is 
+
+a {
+  b ? {
+    initial c ? d ? e ? 
+  }
+  }
+
+
+
+*/
+
 

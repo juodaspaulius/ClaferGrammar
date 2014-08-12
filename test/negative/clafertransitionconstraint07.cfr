@@ -1,0 +1,13 @@
+// Test for negative clafer constraint
+
+a
+ xor b ?
+  	c ##> 
+  	d 
+  	e 
+
+
+
+/*
+Same as clafertransitionconstraint01, instead of failing it takes the following clafer.
+*/

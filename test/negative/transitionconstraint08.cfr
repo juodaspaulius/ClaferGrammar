@@ -1,0 +1,11 @@
+// Test for negative transition constraint
+
+a
+xor b 
+      c 
+      d 
+      e 
+      [ ##> d]   
+
+
+
