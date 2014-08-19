@@ -16,7 +16,8 @@ EnumDecl.       Declaration ::= "enum" PosIdent "=" [EnumId] ;
 ElementDecl.    Declaration ::= Element ;
 
 Clafer.         Clafer ::= Abstract TempModifier GCard PosIdent Super Card Init Transition Elements ;
-Constraint.     Constraint ::= "[" ConstraintExp "]" ;
+FinalConstraint. Constraint ::= "[" "final" "]" ;
+Constraint.      Constraint ::= "[" [Exp] "]" ;
 SoftConstraint. SoftConstraint ::= "(" [Exp] ")";
 Goal.   		Goal ::= "<<" [Exp] ">>" ;
 
@@ -75,9 +76,6 @@ ExIntegerNum.   ExInteger ::= PosInteger ;
 
 Path.           Name ::= [ModId] ;
 
-FinalClaferExp. ConstraintExp ::= "final" ;
-ConstrExp.      ConstraintExp ::= [Exp] ;
-
 -- Transition expressions are right associative and has lowest precedence
 TransitionExp.  Exp ::= Exp1 TransArrow Exp ;
 DeclAllDisj.    Exp1   ::= "all" "disj" Decl "|" Exp1 ;
@@ -100,13 +98,13 @@ LtlU.           Exp8  ::= Exp8 "U"  Exp9 ;
 TmpUntil.       Exp8  ::= Exp8 "until"  Exp9 ;
 LtlW.           Exp9  ::= Exp9 "W"  Exp10 ;
 TmpWUntil.      Exp9  ::= Exp9 "weakuntil"  Exp10 ;
-LtlF.           Exp10  ::= "F"  Exp11 ;
-TmpEventually.  Exp10  ::= "eventually"  Exp11 ;
-LtlG.           Exp11  ::= "G"  Exp12 ;
-TmpGlobally.    Exp11  ::= "globally"  Exp12 ;
-LtlX.           Exp12  ::= "X"  Exp14 ;
-TmpNext.        Exp12  ::= "next"  Exp14 ;
-ENeg.           Exp14  ::= "!" Exp15 ;
+LtlF.           Exp10  ::= "F"  Exp10 ;
+TmpEventually.  Exp10  ::= "eventually"  Exp10 ;
+LtlG.           Exp10  ::= "G"  Exp10 ;
+TmpGlobally.    Exp10  ::= "globally"  Exp10 ;
+LtlX.           Exp10  ::= "X"  Exp10 ;
+TmpNext.        Exp10  ::= "next"  Exp10 ;
+ENeg.           Exp10  ::= "!" Exp10 ;
 ELt.            Exp15  ::= Exp15 "<"  Exp16 ;
 EGt.            Exp15  ::= Exp15 ">"  Exp16 ;
 EEq.            Exp15  ::= Exp15 "="  Exp16 ;
@@ -138,6 +136,7 @@ GuardedSyncTransArrow.     TransArrow ::= "=[" TransGuard "]=>";
 NextTransArrow.            TransArrow ::= "##>";
 GuardedNextTransArrow.     TransArrow ::= "#[" TransGuard "]#>";
 
+PatScopeEmpty.    PatternScope ::= ;
 PatScopeBetween.  PatternScope ::= "between" Exp "and" Exp ;
 PatScopeUntil.    PatternScope ::= "after" Exp "until" Exp ;
 
@@ -155,6 +154,7 @@ Decl.           Decl ::= [LocId] ":" SetExp ;
 VarBinding.     VarBinding ::= LocId "=" Name ;
 
 QuantNo.        Quant ::= "no" ;
+QuantNot.        Quant ::= "not" ;
 QuantLone.      Quant ::= "lone" ;
 QuantOne.       Quant ::= "one" ;
 QuantSome.      Quant ::= "some" ;

@@ -49,7 +49,8 @@ data Clafer =
   deriving (Eq,Ord,Show,Read,Data,Typeable,Generic)
 
 data Constraint =
-   Constraint Span ConstraintExp
+   FinalConstraint Span
+ | Constraint Span [Exp]
   deriving (Eq,Ord,Show,Read,Data,Typeable,Generic)
 
 data SoftConstraint =
@@ -141,11 +142,6 @@ data Name =
    Path Span [ModId]
   deriving (Eq,Ord,Show,Read,Data,Typeable,Generic)
 
-data ConstraintExp =
-   FinalClaferExp Span
- | ConstrExp Span [Exp]
-  deriving (Eq,Ord,Show,Read,Data,Typeable,Generic)
-
 data Exp =
    TransitionExp Span Exp TransArrow Exp
  | DeclAllDisj Span Decl Exp
@@ -212,7 +208,8 @@ data TransArrow =
   deriving (Eq,Ord,Show,Read,Data,Typeable,Generic)
 
 data PatternScope =
-   PatScopeBetween Span Exp Exp
+   PatScopeEmpty Span
+ | PatScopeBetween Span Exp Exp
  | PatScopeUntil Span Exp Exp
   deriving (Eq,Ord,Show,Read,Data,Typeable,Generic)
 
@@ -237,6 +234,7 @@ data VarBinding =
 
 data Quant =
    QuantNo Span
+ | QuantNot Span
  | QuantLone Span
  | QuantOne Span
  | QuantSome Span
@@ -265,6 +263,7 @@ instance Spannable Clafer where
   getSpan ( Clafer s _ _ _ _ _ _ _ _ _ ) = s
 
 instance Spannable Constraint where
+  getSpan ( FinalConstraint s ) = s
   getSpan ( Constraint s _ ) = s
 
 instance Spannable SoftConstraint where
@@ -340,10 +339,6 @@ instance Spannable ExInteger where
 instance Spannable Name where
   getSpan ( Path s _ ) = s
 
-instance Spannable ConstraintExp where
-  getSpan ( FinalClaferExp s ) = s
-  getSpan ( ConstrExp s _ ) = s
-
 instance Spannable Exp where
   getSpan ( TransitionExp s _ _ _ ) = s
   getSpan ( DeclAllDisj s _ _ ) = s
@@ -407,6 +402,7 @@ instance Spannable TransArrow where
   getSpan ( GuardedNextTransArrow s _ ) = s
 
 instance Spannable PatternScope where
+  getSpan ( PatScopeEmpty s ) = s
   getSpan ( PatScopeBetween s _ _ ) = s
   getSpan ( PatScopeUntil s _ _ ) = s
 
@@ -428,6 +424,7 @@ instance Spannable VarBinding where
 
 instance Spannable Quant where
   getSpan ( QuantNo s ) = s
+  getSpan ( QuantNot s ) = s
   getSpan ( QuantLone s ) = s
   getSpan ( QuantOne s ) = s
   getSpan ( QuantSome s ) = s

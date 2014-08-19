@@ -133,7 +133,8 @@ Clafer : Abstract TempModifier GCard PosIdent Super Card Init Transition Element
 
 
 Constraint :: { Constraint }
-Constraint : '[' ConstraintExp ']' { Constraint ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3)) $2 } 
+Constraint : '[' 'final' ']' { FinalConstraint ((mkTokenSpan $1) >- (mkTokenSpan $2) >- (mkTokenSpan $3)) } 
+  | '[' ListExp ']' { Constraint ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3)) (reverse $2) }
 
 
 SoftConstraint :: { SoftConstraint }
@@ -225,11 +226,6 @@ Name :: { Name }
 Name : ListModId { Path ((mkCatSpan $1)) $1 } 
 
 
-ConstraintExp :: { ConstraintExp }
-ConstraintExp : 'final' { FinalClaferExp ((mkTokenSpan $1)) } 
-  | ListExp { ConstrExp ((mkCatSpan $1)) (reverse $1) }
-
-
 Exp :: { Exp }
 Exp : Exp1 TransArrow Exp { TransitionExp ((mkCatSpan $1) >- (mkCatSpan $2) >- (mkCatSpan $3)) $1 $2 $3 } 
   | Exp1 {  $1 }
@@ -292,26 +288,14 @@ Exp9 : Exp9 'W' Exp10 { LtlW ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $
 
 
 Exp10 :: { Exp }
-Exp10 : 'F' Exp11 { LtlF ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 } 
-  | 'eventually' Exp11 { TmpEventually ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
+Exp10 : 'F' Exp10 { LtlF ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 } 
+  | 'eventually' Exp10 { TmpEventually ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
+  | 'G' Exp10 { LtlG ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
+  | 'globally' Exp10 { TmpGlobally ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
+  | 'X' Exp10 { LtlX ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
+  | 'next' Exp10 { TmpNext ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
+  | '!' Exp10 { ENeg ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
   | Exp11 {  $1 }
-
-
-Exp11 :: { Exp }
-Exp11 : 'G' Exp12 { LtlG ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 } 
-  | 'globally' Exp12 { TmpGlobally ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
-  | Exp12 {  $1 }
-
-
-Exp12 :: { Exp }
-Exp12 : 'X' Exp14 { LtlX ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 } 
-  | 'next' Exp14 { TmpNext ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
-  | Exp13 {  $1 }
-
-
-Exp14 :: { Exp }
-Exp14 : '!' Exp15 { ENeg ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 } 
-  | Exp15 {  $1 }
 
 
 Exp15 :: { Exp }
@@ -377,7 +361,8 @@ TransArrow : '-->' { AsyncTransArrow ((mkTokenSpan $1)) }
 
 
 PatternScope :: { PatternScope }
-PatternScope : 'between' Exp 'and' Exp { PatScopeBetween ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $2 $4 } 
+PatternScope : {- empty -} { PatScopeEmpty noSpan } 
+  | 'between' Exp 'and' Exp { PatScopeBetween ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $2 $4 }
   | 'after' Exp 'until' Exp { PatScopeUntil ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $2 $4 }
 
 
@@ -427,6 +412,7 @@ VarBinding : LocId '=' Name { VarBinding ((mkCatSpan $1) >- (mkTokenSpan $2) >- 
 
 Quant :: { Quant }
 Quant : 'no' { QuantNo ((mkTokenSpan $1)) } 
+  | 'not' { QuantNot ((mkTokenSpan $1)) }
   | 'lone' { QuantLone ((mkTokenSpan $1)) }
   | 'one' { QuantOne ((mkTokenSpan $1)) }
   | 'some' { QuantSome ((mkTokenSpan $1)) }
@@ -474,8 +460,20 @@ ListModId : ModId { (:[])  $1 }
   | ModId '\\' ListModId { (:)  $1 $3 }
 
 
+Exp11 :: { Exp }
+Exp11 : Exp12 {  $1 } 
+
+
+Exp12 :: { Exp }
+Exp12 : Exp13 {  $1 } 
+
+
 Exp13 :: { Exp }
 Exp13 : Exp14 {  $1 } 
+
+
+Exp14 :: { Exp }
+Exp14 : Exp15 {  $1 } 
 
 
 

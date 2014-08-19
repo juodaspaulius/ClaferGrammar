@@ -73,7 +73,8 @@ All other symbols are terminals.
   | //Declaration// | -> | ``enum`` //PosIdent// ``=`` //[EnumId]// 
   |  |  **|**  | //Element// 
   | //Clafer// | -> | //Abstract// //TempModifier// //GCard// //PosIdent// //Super// //Card// //Init// //Transition// //Elements// 
-  | //Constraint// | -> | ``[`` //ConstraintExp// ``]`` 
+  | //Constraint// | -> | ``[`` ``final`` ``]`` 
+  |  |  **|**  | ``[`` //[Exp]// ``]`` 
   | //SoftConstraint// | -> | ``(`` //[Exp]// ``)`` 
   | //Goal// | -> | ``<<`` //[Exp]// ``>>`` 
   | //TempModifier// | -> | **eps**
@@ -115,8 +116,6 @@ All other symbols are terminals.
   | //ExInteger// | -> | ``*`` 
   |  |  **|**  | //PosInteger// 
   | //Name// | -> | //[ModId]// 
-  | //ConstraintExp// | -> | ``final`` 
-  |  |  **|**  | //[Exp]// 
   | //Exp// | -> | //Exp1// //TransArrow// //Exp// 
   |  |  **|**  | //Exp1// 
   | //Exp1// | -> | ``all`` ``disj`` //Decl// ``|`` //Exp1// 
@@ -148,17 +147,14 @@ All other symbols are terminals.
   | //Exp9// | -> | //Exp9// ``W`` //Exp10// 
   |  |  **|**  | //Exp9// ``weakuntil`` //Exp10// 
   |  |  **|**  | //Exp10// 
-  | //Exp10// | -> | ``F`` //Exp11// 
-  |  |  **|**  | ``eventually`` //Exp11// 
+  | //Exp10// | -> | ``F`` //Exp10// 
+  |  |  **|**  | ``eventually`` //Exp10// 
+  |  |  **|**  | ``G`` //Exp10// 
+  |  |  **|**  | ``globally`` //Exp10// 
+  |  |  **|**  | ``X`` //Exp10// 
+  |  |  **|**  | ``next`` //Exp10// 
+  |  |  **|**  | ``!`` //Exp10// 
   |  |  **|**  | //Exp11// 
-  | //Exp11// | -> | ``G`` //Exp12// 
-  |  |  **|**  | ``globally`` //Exp12// 
-  |  |  **|**  | //Exp12// 
-  | //Exp12// | -> | ``X`` //Exp14// 
-  |  |  **|**  | ``next`` //Exp14// 
-  |  |  **|**  | //Exp13// 
-  | //Exp14// | -> | ``!`` //Exp15// 
-  |  |  **|**  | //Exp15// 
   | //Exp15// | -> | //Exp15// ``<`` //Exp16// 
   |  |  **|**  | //Exp15// ``>`` //Exp16// 
   |  |  **|**  | //Exp15// ``=`` //Exp16// 
@@ -194,7 +190,8 @@ All other symbols are terminals.
   |  |  **|**  | ``=[`` //TransGuard// ``]=>`` 
   |  |  **|**  | ``##>`` 
   |  |  **|**  | ``#[`` //TransGuard// ``]#>`` 
-  | //PatternScope// | -> | ``between`` //Exp// ``and`` //Exp// 
+  | //PatternScope// | -> | **eps**
+  |  |  **|**  | ``between`` //Exp// ``and`` //Exp// 
   |  |  **|**  | ``after`` //Exp// ``until`` //Exp// 
   | //SetExp// | -> | //SetExp// ``++`` //SetExp1// 
   |  |  **|**  | //SetExp// ``,`` //SetExp1// 
@@ -214,6 +211,7 @@ All other symbols are terminals.
   | //Decl// | -> | //[LocId]// ``:`` //SetExp// 
   | //VarBinding// | -> | //LocId// ``=`` //Name// 
   | //Quant// | -> | ``no`` 
+  |  |  **|**  | ``not`` 
   |  |  **|**  | ``lone`` 
   |  |  **|**  | ``one`` 
   |  |  **|**  | ``some`` 
@@ -232,6 +230,9 @@ All other symbols are terminals.
   |  |  **|**  | //LocId// ``;`` //[LocId]// 
   | //[ModId]// | -> | //ModId// 
   |  |  **|**  | //ModId// ``\`` //[ModId]// 
+  | //Exp11// | -> | //Exp12// 
+  | //Exp12// | -> | //Exp13// 
   | //Exp13// | -> | //Exp14// 
+  | //Exp14// | -> | //Exp15// 
 
 

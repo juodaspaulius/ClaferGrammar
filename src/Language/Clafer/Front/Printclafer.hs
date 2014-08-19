@@ -117,7 +117,8 @@ instance Print Clafer where
 
 instance Print Constraint where
   prt i e = case e of
-   Constraint _ constraintexp -> prPrec i 0 (concatD [doc (showString "[") , prt 0 constraintexp , doc (showString "]")])
+   FinalConstraint _  -> prPrec i 0 (concatD [doc (showString "[") , doc (showString "final") , doc (showString "]")])
+   Constraint _ exps -> prPrec i 0 (concatD [doc (showString "[") , prt 0 exps , doc (showString "]")])
 
 
 instance Print SoftConstraint where
@@ -228,12 +229,6 @@ instance Print Name where
    Path _ modids -> prPrec i 0 (concatD [prt 0 modids])
 
 
-instance Print ConstraintExp where
-  prt i e = case e of
-   FinalClaferExp _  -> prPrec i 0 (concatD [doc (showString "final")])
-   ConstrExp _ exps -> prPrec i 0 (concatD [prt 0 exps])
-
-
 instance Print Exp where
   prt i e = case e of
    TransitionExp _ exp0 transarrow exp -> prPrec i 0 (concatD [prt 1 exp0 , prt 0 transarrow , prt 0 exp])
@@ -257,13 +252,13 @@ instance Print Exp where
    TmpUntil _ exp0 exp -> prPrec i 8 (concatD [prt 8 exp0 , doc (showString "until") , prt 9 exp])
    LtlW _ exp0 exp -> prPrec i 9 (concatD [prt 9 exp0 , doc (showString "W") , prt 10 exp])
    TmpWUntil _ exp0 exp -> prPrec i 9 (concatD [prt 9 exp0 , doc (showString "weakuntil") , prt 10 exp])
-   LtlF _ exp -> prPrec i 10 (concatD [doc (showString "F") , prt 11 exp])
-   TmpEventually _ exp -> prPrec i 10 (concatD [doc (showString "eventually") , prt 11 exp])
-   LtlG _ exp -> prPrec i 11 (concatD [doc (showString "G") , prt 12 exp])
-   TmpGlobally _ exp -> prPrec i 11 (concatD [doc (showString "globally") , prt 12 exp])
-   LtlX _ exp -> prPrec i 12 (concatD [doc (showString "X") , prt 14 exp])
-   TmpNext _ exp -> prPrec i 12 (concatD [doc (showString "next") , prt 14 exp])
-   ENeg _ exp -> prPrec i 14 (concatD [doc (showString "!") , prt 15 exp])
+   LtlF _ exp -> prPrec i 10 (concatD [doc (showString "F") , prt 10 exp])
+   TmpEventually _ exp -> prPrec i 10 (concatD [doc (showString "eventually") , prt 10 exp])
+   LtlG _ exp -> prPrec i 10 (concatD [doc (showString "G") , prt 10 exp])
+   TmpGlobally _ exp -> prPrec i 10 (concatD [doc (showString "globally") , prt 10 exp])
+   LtlX _ exp -> prPrec i 10 (concatD [doc (showString "X") , prt 10 exp])
+   TmpNext _ exp -> prPrec i 10 (concatD [doc (showString "next") , prt 10 exp])
+   ENeg _ exp -> prPrec i 10 (concatD [doc (showString "!") , prt 10 exp])
    ELt _ exp0 exp -> prPrec i 15 (concatD [prt 15 exp0 , doc (showString "<") , prt 16 exp])
    EGt _ exp0 exp -> prPrec i 15 (concatD [prt 15 exp0 , doc (showString ">") , prt 16 exp])
    EEq _ exp0 exp -> prPrec i 15 (concatD [prt 15 exp0 , doc (showString "=") , prt 16 exp])
@@ -307,6 +302,7 @@ instance Print TransArrow where
 
 instance Print PatternScope where
   prt i e = case e of
+   PatScopeEmpty _  -> prPrec i 0 (concatD [])
    PatScopeBetween _ exp0 exp -> prPrec i 0 (concatD [doc (showString "between") , prt 0 exp0 , doc (showString "and") , prt 0 exp])
    PatScopeUntil _ exp0 exp -> prPrec i 0 (concatD [doc (showString "after") , prt 0 exp0 , doc (showString "until") , prt 0 exp])
 
@@ -336,6 +332,7 @@ instance Print VarBinding where
 instance Print Quant where
   prt i e = case e of
    QuantNo _  -> prPrec i 0 (concatD [doc (showString "no")])
+   QuantNot _  -> prPrec i 0 (concatD [doc (showString "not")])
    QuantLone _  -> prPrec i 0 (concatD [doc (showString "lone")])
    QuantOne _  -> prPrec i 0 (concatD [doc (showString "one")])
    QuantSome _  -> prPrec i 0 (concatD [doc (showString "some")])
