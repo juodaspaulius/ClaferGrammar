@@ -1,0 +1,115 @@
+/*
+Raghava Rao Mukkamala, (based on Paulius's model) 
+Modeling of TLS Handshake protocol in behavioral clafer
+
+*/
+
+
+abstract DescribedElement
+	descr -> string ?
+
+abstract Domain
+
+enum ProtocolVersion = SSL2_0 | SSL3_0 | TLS1_0 | TLS1_1 | TLS1_2
+
+//enum HandshakeStatus = Initiated | Failure | Completed
+
+
+
+abstract node : Domain
+  sessionId ?
+  protocolversion -> ProtocolVersion 1..* 
+  certificate ?
+
+
+// We need to use redefine to restrict some settings.
+abstract Server : node
+	
+
+abstract Client : node
+	protocolversion 1 
+
+
+Protocol : Domain
+  client : Client
+  server : Server
+  initial clientInitialConnection ?
+  annonymous ?
+ 
+  xor handshakeStatus
+	initial initiated ==> completed || failed
+        completed --> initiated
+	  [completed => globally no clientInitialConnection]
+        failed --> initiated
+	  [failed => globally no clientInitialConnection]
+
+  xor channel
+    initial xor clientTransmission ==> serverTransmission
+	initail clientHello  ##> ( serverHello || fetalError )
+        clientCertificate ? ##> clientKeyExchange
+	clientKeyExchange ==> (certificateVerify || clientChangeCipherSpec)
+	certificateVerify ? ##> clientChangeCipherSpec
+        clientChangeCipherSpec ##> clientFinished
+        clientFinished : DescribedElement ##> (serverChangeCipherSpec || fetalError)
+          descr = "After clientFinished, the server is allowed to throw fetal error otherwise followed by serverChangeCipherSpec"
+           
+    xor serverTransmission
+	helloRequest : DescribedElement ?
+	  descr = " server can send helloRequest  Only if client is connected previously and if not negeotiating  currently"
+	  [ !clientInitialConnection && !initiated]
+	serverHello :  DescribedElement  #[no annonymous]#> serverCertificate
+          descr = " serverHello indicates that client's protocol version is in server's supported protocols"
+          [client.protocolversion in server.protocolversion]
+          [ serverHello ##> (serverCertificate || serverKeyExchange || certificateRequest || serverHelloDone || fetalError) ]
+	serverCertificate ? --> serverKeyExchange
+	serverKeyExchange ?
+	certificateRequest : DescribedElement ?  ##> (serverHelloDone || fetalError)
+	  descr = "This can only happen in non-annonymous mode"
+	  [no annonymous]
+          [eventually clientCertificate]
+	serverHelloDone : DescribedElement ##> (clientCertificate || clientKeyExchange)  
+          descr = "After serverHelloDone server will wait for the server to respond"
+	serverChangeCipherSpec ##> serverFinished 
+	serverFinished
+	  [completed]
+	fetalError 
+          [failed]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
