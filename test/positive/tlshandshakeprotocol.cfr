@@ -1,6 +1,7 @@
 /*
 Raghava Rao Mukkamala, (based on Paulius's model) 
 Modeling of TLS Handshake protocol in behavioral clafer
+verified with latest parser on 25-08-2014
 
 */
 
