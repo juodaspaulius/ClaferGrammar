@@ -83,6 +83,11 @@ DeclAll.        Exp1   ::= "all"        Decl "|" Exp1 ;
 DeclQuantDisj.  Exp1   ::= Quant "disj" Decl "|" Exp1 ;
 DeclQuant.      Exp1   ::= Quant        Decl "|" Exp1 ;
 LetExp.         Exp1 ::= "let" VarBinding "in" Exp1;
+-- TmpPatBetween.   Exp2 ::= Exp3 PatternScope;
+-- TmpPatAfterUntil. Exp2 ::= Exp3 PatternScope;
+TmpPatJustScope. Exp2 ::= Exp3 PatternScope;
+TmpPatBeforeNoScope.   Exp2 ::= Exp3 "before" Exp3;
+TmpPatAfterNoScope.    Exp2 ::= Exp3 "after" Exp3;
 TmpPatBefore.   Exp2 ::= Exp3 "before" Exp3 PatternScope;
 TmpPatAfter.    Exp2 ::= Exp3 "after" Exp3 PatternScope;
 TmpInitially.   Exp2 ::= "initially" Exp3;
@@ -136,7 +141,10 @@ GuardedSyncTransArrow.     TransArrow ::= "=[" TransGuard "]=>";
 NextTransArrow.            TransArrow ::= "##>";
 GuardedNextTransArrow.     TransArrow ::= "#[" TransGuard "]#>";
 
-PatScopeEmpty.    PatternScope ::= ;
+-- PatScopeEmpty.    PatternScope ::= ;
+-- PatScopeBetween.  PatternScope ::= "between" Exp "and" Exp ;
+-- PatScopeUntil.    PatternScope ::= "after" Exp "until" Exp ;
+
 PatScopeBetween.  PatternScope ::= "between" Exp "and" Exp ;
 PatScopeUntil.    PatternScope ::= "after" Exp "until" Exp ;
 

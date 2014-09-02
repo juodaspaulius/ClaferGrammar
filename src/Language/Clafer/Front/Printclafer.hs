@@ -237,6 +237,9 @@ instance Print Exp where
    DeclQuantDisj _ quant decl exp -> prPrec i 1 (concatD [prt 0 quant , doc (showString "disj") , prt 0 decl , doc (showString "|") , prt 1 exp])
    DeclQuant _ quant decl exp -> prPrec i 1 (concatD [prt 0 quant , prt 0 decl , doc (showString "|") , prt 1 exp])
    LetExp _ varbinding exp -> prPrec i 1 (concatD [doc (showString "let") , prt 0 varbinding , doc (showString "in") , prt 1 exp])
+   TmpPatJustScope _ exp patternscope -> prPrec i 2 (concatD [prt 3 exp , prt 0 patternscope])
+   TmpPatBeforeNoScope _ exp0 exp -> prPrec i 2 (concatD [prt 3 exp0 , doc (showString "before") , prt 3 exp])
+   TmpPatAfterNoScope _ exp0 exp -> prPrec i 2 (concatD [prt 3 exp0 , doc (showString "after") , prt 3 exp])
    TmpPatBefore _ exp0 exp patternscope -> prPrec i 2 (concatD [prt 3 exp0 , doc (showString "before") , prt 3 exp , prt 0 patternscope])
    TmpPatAfter _ exp0 exp patternscope -> prPrec i 2 (concatD [prt 3 exp0 , doc (showString "after") , prt 3 exp , prt 0 patternscope])
    TmpInitially _ exp -> prPrec i 2 (concatD [doc (showString "initially") , prt 3 exp])
@@ -302,7 +305,6 @@ instance Print TransArrow where
 
 instance Print PatternScope where
   prt i e = case e of
-   PatScopeEmpty _  -> prPrec i 0 (concatD [])
    PatScopeBetween _ exp0 exp -> prPrec i 0 (concatD [doc (showString "between") , prt 0 exp0 , doc (showString "and") , prt 0 exp])
    PatScopeUntil _ exp0 exp -> prPrec i 0 (concatD [doc (showString "after") , prt 0 exp0 , doc (showString "until") , prt 0 exp])
 

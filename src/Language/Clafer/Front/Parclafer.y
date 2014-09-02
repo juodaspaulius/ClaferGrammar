@@ -241,7 +241,10 @@ Exp1 : 'all' 'disj' Decl '|' Exp1 { DeclAllDisj ((mkTokenSpan $1) >- (mkTokenSpa
 
 
 Exp2 :: { Exp }
-Exp2 : Exp3 'before' Exp3 PatternScope { TmpPatBefore ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3) >- (mkCatSpan $4)) $1 $3 $4 } 
+Exp2 : Exp3 PatternScope { TmpPatJustScope ((mkCatSpan $1) >- (mkCatSpan $2)) $1 $2 } 
+  | Exp3 'before' Exp3 { TmpPatBeforeNoScope ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
+  | Exp3 'after' Exp3 { TmpPatAfterNoScope ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3)) $1 $3 }
+  | Exp3 'before' Exp3 PatternScope { TmpPatBefore ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3) >- (mkCatSpan $4)) $1 $3 $4 }
   | Exp3 'after' Exp3 PatternScope { TmpPatAfter ((mkCatSpan $1) >- (mkTokenSpan $2) >- (mkCatSpan $3) >- (mkCatSpan $4)) $1 $3 $4 }
   | 'initially' Exp3 { TmpInitially ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
   | 'finally' Exp3 { TmpFinally ((mkTokenSpan $1) >- (mkCatSpan $2)) $2 }
@@ -361,8 +364,7 @@ TransArrow : '-->' { AsyncTransArrow ((mkTokenSpan $1)) }
 
 
 PatternScope :: { PatternScope }
-PatternScope : {- empty -} { PatScopeEmpty noSpan } 
-  | 'between' Exp 'and' Exp { PatScopeBetween ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $2 $4 }
+PatternScope : 'between' Exp 'and' Exp { PatScopeBetween ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $2 $4 } 
   | 'after' Exp 'until' Exp { PatScopeUntil ((mkTokenSpan $1) >- (mkCatSpan $2) >- (mkTokenSpan $3) >- (mkCatSpan $4)) $2 $4 }
 
 
